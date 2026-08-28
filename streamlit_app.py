@@ -39,6 +39,7 @@ remaining_purchases = net_purchases_needed * 0.10   # 10% late Nov/Dec (Weeks 11
 weekly_data = []
 curr_inv = start_inv
 
+# Weekly sales breakdown (4 weeks for Sep/Oct/Nov, 5 weeks for Dec)
 sales_by_week = [
     sep_sales/4]*4 + [oct_sales/4]*4 + [nov_sales/4]*4 + [dec_sales/5]*5
 
@@ -80,8 +81,8 @@ df = pd.DataFrame(weekly_data)
 # --- Visualizations & Data Table ---
 st.subheader("Inventory & Sales Trajectory")
 
-# Clean native Streamlit line chart
-chart_df = df.set_index("Week")[["Purchases ($)", "Ending Inventory ($)", "Weekly COGS ($)"]]
+# Line chart now includes Weekly Sales ($)
+chart_df = df.set_index("Week")[["Weekly Sales ($)", "Purchases ($)", "Ending Inventory ($)", "Weekly COGS ($)"]]
 st.line_chart(chart_df)
 
 st.subheader("Weekly Breakdown")
