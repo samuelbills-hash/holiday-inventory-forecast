@@ -77,4 +77,18 @@ for w in range(1, 18):
 
 df = pd.DataFrame(weekly_data)
 
-# --- Visualizations ---
+# --- Chart 1: Sales, Purchases & COGS ---
+st.subheader("Weekly Cash & Sales Flow")
+st.caption("Weekly Sales, Purchases, and Cost of Goods Sold.")
+chart_df_flow = df.set_index("Week")[["Weekly Sales ($)", "Purchases ($)", "Weekly COGS ($)"]]
+st.line_chart(chart_df_flow)
+
+# --- Chart 2: Ending Inventory Position ---
+st.subheader("Inventory Position vs. Weekly Sales")
+st.caption("Ending inventory balance week-by-week alongside weekly sales.")
+chart_df_inv = df.set_index("Week")[["Ending Inventory ($)", "Weekly Sales ($)"]]
+st.line_chart(chart_df_inv)
+
+# --- Data Table ---
+st.subheader("Weekly Breakdown Table")
+st.dataframe(df, use_container_width=True)
