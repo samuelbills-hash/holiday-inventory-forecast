@@ -10,7 +10,7 @@ st.markdown("Adjust the parameters on the sidebar to update weekly purchasing an
 st.sidebar.header("Forecast Settings")
 start_inv = st.sidebar.number_input("Starting Inventory ($)", value=40000, step=5000)
 gross_margin = st.sidebar.slider("Gross Margin (%)", min_value=30, max_value=70, value=52) / 100
-target_ending_inv = st.sidebar.number_input("Target Dec 31 Inventory Buffer ($)", value=0, step=2500)
+target_ending_inv = st.sidebar.number_input("Target Dec 31 ($)", value=0, step=2500)
 
 # Monthly Retail Sales Inputs
 st.sidebar.subheader("Monthly Retail Sales")
