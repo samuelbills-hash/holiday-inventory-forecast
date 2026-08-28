@@ -33,6 +33,9 @@ col4.metric("Net Purchases Needed", f"${net_purchases_needed:,.0f}")
 
 # --- Weekly Purchasing Allocation Logic ---
 # 17 weeks total (Sep: 4 wks, Oct: 4 wks, Nov: 4 wks, Dec: 5 wks)
+import datetime
+
+# --- Weekly Purchasing Allocation Logic ---
 front_load_purchases = net_purchases_needed * 0.90  # 90% by mid-Nov (Weeks 1-10)
 remaining_purchases = net_purchases_needed * 0.10   # 10% late Nov/Dec (Weeks 11-17)
 
@@ -42,24 +45,38 @@ curr_inv = start_inv
 sales_by_week = [
     sep_sales/4]*4 + [oct_sales/4]*4 + [nov_sales/4]*4 + [dec_sales/5]*5
 
+# Start date anchor: Sept 1, 2026
+start_date = datetime.date(2026, 9, 1)
+
 for w in range(1, 18):
     w_sales = sales_by_week[w-1]
     w_cogs = w_sales * cogs_rate
     
-    # Purchasing Logic: Front-load 90% across W1-W10, remaining across W11-W15
-    if w <= 8:
-        w_pur = (front_load_purchases * 0.88) / 8  # Sept & Oct build
-    elif w <= 10:
-        w_pur = (front_load_purchases * 0.12) / 2  # Early Nov build
-    elif w <= 15:
-        w_pur = remaining_purchases / 5            # Late Nov / Dec top-ups
+    # Calculate 2026 date range for the week
+    w_start = start_date + datetime.timedelta(days=(w-1)*7)
+    
+    # For the final week (Week 17), cap the end date at Dec 31
+    if w == 17:
+        w_end = datetime.date(2026, 12, 31)
     else:
-        w_pur = 0.0                                 # Year-end sell-through
+        w_end = w_start + datetime.timedelta(days=6)
+        
+    date_label = f"{w_start.strftime('%b %d')} - {w_end.strftime('%b %d')}"
+    
+    # Purchasing Allocation Logic
+    if w <= 8:
+        w_pur = (front_load_purchases * 0.88) / 8
+    elif w <= 10:
+        w_pur = (front_load_purchases * 0.12) / 2
+    elif w <= 15:
+        w_pur = remaining_purchases / 5
+    else:
+        w_pur = 0.0
         
     curr_inv = curr_inv + w_pur - w_cogs
     
     weekly_data.append({
-        "Week": f"Week {w}",
+        "Week": f"W{w} ({date_label})",
         "Weekly Sales ($)": round(w_sales, 2),
         "Weekly COGS ($)": round(w_cogs, 2),
         "Purchases ($)": round(w_pur, 2),
