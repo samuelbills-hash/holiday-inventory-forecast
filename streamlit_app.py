@@ -1,6 +1,7 @@
+import datetime
+import pandas as pd
 import plotly.express as px
 import streamlit as st
-import pandas as pd
 
 st.set_page_config(page_title="Holiday Retail Purchasing Forecast", layout="wide")
 
@@ -31,10 +32,6 @@ col1.metric("Total Retail Sales", f"${total_sales:,.0f}")
 col2.metric("Total COGS Needed", f"${total_cogs:,.0f}")
 col3.metric("Starting Inventory", f"${start_inv:,.0f}")
 col4.metric("Net Purchases Needed", f"${net_purchases_needed:,.0f}")
-
-# --- Weekly Purchasing Allocation Logic ---
-# 17 weeks total (Sep: 4 wks, Oct: 4 wks, Nov: 4 wks, Dec: 5 wks)
-import datetime
 
 # --- Weekly Purchasing Allocation Logic ---
 front_load_purchases = net_purchases_needed * 0.90  # 90% by mid-Nov (Weeks 1-10)
@@ -77,7 +74,7 @@ for w in range(1, 18):
     curr_inv = curr_inv + w_pur - w_cogs
     
     weekly_data.append({
-        "Week": f"W{w} ({date_label})",
+        "Week": f"W{w:02d} ({date_label})",  # Formats as W01, W02 for proper sorting
         "Weekly Sales ($)": round(w_sales, 2),
         "Weekly COGS ($)": round(w_cogs, 2),
         "Purchases ($)": round(w_pur, 2),
@@ -88,7 +85,6 @@ df = pd.DataFrame(weekly_data)
 
 # --- Visualizations & Data Table ---
 st.subheader("Inventory & Sales Trajectory")
-import plotly.express as px
 
 # Convert data for Plotly charting
 df_melted = df.melt(
@@ -104,14 +100,10 @@ fig = px.line(
     y="Amount ($)", 
     color="Metric",
     markers=True,
-    title="Inventory & Sales Trajectory"
+    title="Inventory & Sales Trajectory (2026 Calendar)"
 )
 
-# Keeps chronological order and cleans up x-axis ticks
-fig.update_xaxes(type='category', tickangle=-45)
-fig.update_layout(hovermode="x unified")
-
-st.plotly_chart(fig, use_container_width=True)
-
-st.subheader("Weekly Breakdown")
-st.dataframe(df, use_container_width=True)
+# Enforce explicit array chronological ordering on X-axis
+fig.update_xaxes(
+    type='category', 
+    tickangle=-45
