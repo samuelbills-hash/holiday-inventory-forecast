@@ -1,6 +1,5 @@
 import datetime
 import pandas as pd
-import plotly.express as px
 import streamlit as st
 
 st.set_page_config(page_title="Holiday Retail Purchasing Forecast", layout="wide")
@@ -43,17 +42,13 @@ curr_inv = start_inv
 sales_by_week = [
     sep_sales/4]*4 + [oct_sales/4]*4 + [nov_sales/4]*4 + [dec_sales/5]*5
 
-# Start date anchor: Sept 1, 2026
 start_date = datetime.date(2026, 9, 1)
 
 for w in range(1, 18):
     w_sales = sales_by_week[w-1]
     w_cogs = w_sales * cogs_rate
     
-    # Calculate 2026 date range for the week
     w_start = start_date + datetime.timedelta(days=(w-1)*7)
-    
-    # For the final week (Week 17), cap the end date at Dec 31
     if w == 17:
         w_end = datetime.date(2026, 12, 31)
     else:
@@ -61,7 +56,6 @@ for w in range(1, 18):
         
     date_label = f"{w_start.strftime('%b %d')} - {w_end.strftime('%b %d')}"
     
-    # Purchasing Allocation Logic
     if w <= 8:
         w_pur = (front_load_purchases * 0.88) / 8
     elif w <= 10:
@@ -86,33 +80,9 @@ df = pd.DataFrame(weekly_data)
 # --- Visualizations & Data Table ---
 st.subheader("Inventory & Sales Trajectory")
 
-# Convert data for Plotly charting
-df_melted = df.melt(
-    id_vars=["Week"], 
-    value_vars=["Ending Inventory ($)", "Purchases ($)", "Weekly COGS ($)"],
-    var_name="Metric", 
-    value_name="Amount ($)"
-)
-
-fig = px.line(
-    df_melted, 
-    x="Week", 
-    y="Amount ($)", 
-    color="Metric",
-    markers=True,
-    title="Inventory & Sales Trajectory (2026 Calendar)"
-)
-
-# Enforce explicit array chronological ordering on X-axis
-fig.update_xaxes(
-    type='category', 
-    tickangle=-45,
-    categoryorder="array",
-    categoryarray=df["Week"].tolist()
-)
-fig.update_layout(hovermode="x unified")
-
-st.plotly_chart(fig, use_container_width=True)
+# Clean native Streamlit line chart
+chart_df = df.set_index("Week")[["Purchases ($)", "Ending Inventory ($)", "Weekly COGS ($)"]]
+st.line_chart(chart_df)
 
 st.subheader("Weekly Breakdown")
 st.dataframe(df, use_container_width=True)
