@@ -1,7 +1,5 @@
 import datetime
 import pandas as pd
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import streamlit as st
 
 st.set_page_config(page_title="Holiday Retail Purchasing Forecast", layout="wide")
@@ -79,72 +77,25 @@ for w in range(1, 18):
 
 df = pd.DataFrame(weekly_data)
 
-# --- Dual-Axis Visualizations ---
+# --- Dual-View Visualizations ---
 st.subheader("Inventory & Sales Trajectory")
 
-# Create figure with secondary y-axis
-fig = make_subplots(specs=[[{"secondary_y": True}]])
+tab1, tab2 = st.tabs(["Indexed Growth (100 = Baseline)", "Raw Dollar Values"])
 
-# 1. Soft Background Line on Secondary Y-Axis (Right)
-fig.add_trace(
-    go.Scatter(
-        x=df["Week"],
-        y=df["Ending Inventory ($)"],
-        name="Ending Inventory ($)",
-        line=dict(color="#B0BEC5", width=3, dash="dot"), # Soft blue-gray dot line
-        opacity=0.7
-    ),
-    secondary_y=True
-)
+with tab1:
+    st.caption("Normalizes all metrics relative to Week 1 (100 = Week 1 value) to compare weekly trends without dollar scale distortion.")
+    # Normalize values relative to week 1 (Week 1 = 100)
+    norm_df = df.set_index("Week")[["Weekly Sales ($)", "Purchases ($)", "Weekly COGS ($)", "Ending Inventory ($)"]].copy()
+    for col in norm_df.columns:
+        first_val = norm_df[col].iloc[0]
+        if first_val != 0:
+            norm_df[col] = (norm_df[col] / first_val) * 100
+    st.line_chart(norm_df)
 
-# 2. Dynamic Primary Lines on Main Y-Axis (Left)
-fig.add_trace(
-    go.Scatter(
-        x=df["Week"],
-        y=df["Weekly Sales ($)"],
-        name="Weekly Sales ($)",
-        line=dict(color="#2E7D32", width=3) # Vibrant Green
-    ),
-    secondary_y=False
-)
-
-fig.add_trace(
-    go.Scatter(
-        x=df["Week"],
-        y=df["Purchases ($)"],
-        name="Purchases ($)",
-        line=dict(color="#0288D1", width=3) # Bright Blue
-    ),
-    secondary_y=False
-)
-
-fig.add_trace(
-    go.Scatter(
-        x=df["Week"],
-        y=df["Weekly COGS ($)"],
-        name="Weekly COGS ($)",
-        line=dict(color="#D32F2F", width=3) # Bright Red
-    ),
-    secondary_y=False
-)
-
-# Axis Titles & Ordering
-fig.update_xaxes(
-    type='category', 
-    tickangle=-45,
-    categoryorder="array",
-    categoryarray=df["Week"].tolist()
-)
-
-fig.update_yaxes(title_text="Weekly Flow ($) [Sales, Purchases, COGS]", secondary_y=False)
-fig.update_yaxes(title_text="Total Ending Inventory ($)", secondary_y=True, showgrid=False)
-
-fig.update_layout(
-    hovermode="x unified",
-    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-)
-
-st.plotly_chart(fig, use_container_width=True)
+with tab2:
+    st.caption("Raw dollar amounts for each weekly metric.")
+    chart_df = df.set_index("Week")[["Weekly Sales ($)", "Purchases ($)", "Weekly COGS ($)", "Ending Inventory ($)"]]
+    st.line_chart(chart_df)
 
 st.subheader("Weekly Breakdown")
 st.dataframe(df, use_container_width=True)
