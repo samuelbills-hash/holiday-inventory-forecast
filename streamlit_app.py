@@ -9,16 +9,16 @@ st.markdown("Adjust the parameters on the sidebar to update weekly purchasing an
 
 # --- Sidebar Inputs ---
 st.sidebar.header("Forecast Settings")
-start_inv = st.sidebar.number_input("Starting Inventory ($)", value=40000, step=5000)
+start_inv = st.sidebar.number_input("Starting Inventory ($)", value=55000, step=5000)
 gross_margin = st.sidebar.slider("Gross Margin (%)", min_value=30, max_value=70, value=52) / 100
-target_ending_inv = st.sidebar.number_input("Target Dec 31 ($)", value=0, step=2500)
+target_ending_inv = st.sidebar.number_input("Target Dec 31 ($)", value=35000, step=2500)
 
 # Monthly Retail Sales Inputs
 st.sidebar.subheader("Monthly Retail Sales")
-sep_sales = st.sidebar.number_input("September Sales ($)", value=20000)
-oct_sales = st.sidebar.number_input("October Sales ($)", value=30000)
-nov_sales = st.sidebar.number_input("November Sales ($)", value=60000)
-dec_sales = st.sidebar.number_input("December Sales ($)", value=140000)
+sep_sales = st.sidebar.number_input("September Sales ($)", value=20844)
+oct_sales = st.sidebar.number_input("October Sales ($)", value=30226)
+nov_sales = st.sidebar.number_input("November Sales ($)", value=68833)
+dec_sales = st.sidebar.number_input("December Sales ($)", value=115829)
 
 total_sales = sep_sales + oct_sales + nov_sales + dec_sales
 cogs_rate = 1 - gross_margin
