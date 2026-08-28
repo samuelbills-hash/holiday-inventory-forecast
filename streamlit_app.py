@@ -77,25 +77,4 @@ for w in range(1, 18):
 
 df = pd.DataFrame(weekly_data)
 
-# --- Dual-View Visualizations ---
-st.subheader("Inventory & Sales Trajectory")
-
-tab1, tab2 = st.tabs(["Indexed Growth (100 = Baseline)", "Raw Dollar Values"])
-
-with tab1:
-    st.caption("Normalizes all metrics relative to Week 1 (100 = Week 1 value) to compare weekly trends without dollar scale distortion.")
-    # Normalize values relative to week 1 (Week 1 = 100)
-    norm_df = df.set_index("Week")[["Weekly Sales ($)", "Purchases ($)", "Weekly COGS ($)", "Ending Inventory ($)"]].copy()
-    for col in norm_df.columns:
-        first_val = norm_df[col].iloc[0]
-        if first_val != 0:
-            norm_df[col] = (norm_df[col] / first_val) * 100
-    st.line_chart(norm_df)
-
-with tab2:
-    st.caption("Raw dollar amounts for each weekly metric.")
-    chart_df = df.set_index("Week")[["Weekly Sales ($)", "Purchases ($)", "Weekly COGS ($)", "Ending Inventory ($)"]]
-    st.line_chart(chart_df)
-
-st.subheader("Weekly Breakdown")
-st.dataframe(df, use_container_width=True)
+# --- Visualizations ---
