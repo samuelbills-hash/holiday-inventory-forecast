@@ -9,7 +9,7 @@ st.markdown("Adjust the parameters on the sidebar to update weekly purchasing an
 
 # --- Sidebar Inputs ---
 st.sidebar.header("Forecast Settings")
-start_inv = st.sidebar.number_input("Starting Inventory ($)", value=55000, step=5000)
+start_inv = st.sidebar.number_input("Starting Inventory Sep 1 ($)", value=55000, step=5000)
 gross_margin = st.sidebar.slider("Gross Margin (%)", min_value=30, max_value=70, value=52) / 100
 target_ending_inv = st.sidebar.number_input("Target Dec 31 ($)", value=35000, step=2500)
 
@@ -29,7 +29,7 @@ net_purchases_needed = max(0.0, total_cogs + target_ending_inv - start_inv)
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Total Retail Sales", f"${total_sales:,.0f}")
 col2.metric("Total COGS Needed", f"${total_cogs:,.0f}")
-col3.metric("Starting Inventory", f"${start_inv:,.0f}")
+col3.metric("Starting Inventory Sep 1", f"${start_inv:,.0f}")
 col4.metric("Net Purchases Needed", f"${net_purchases_needed:,.0f}")
 
 # --- Weekly Purchasing Allocation Logic ---
