@@ -1,3 +1,4 @@
+import plotly.express as px
 import streamlit as st
 import pandas as pd
 
@@ -87,7 +88,30 @@ df = pd.DataFrame(weekly_data)
 
 # --- Visualizations & Data Table ---
 st.subheader("Inventory & Sales Trajectory")
-st.line_chart(df.set_index("Week")[["Purchases ($)", "Ending Inventory ($)", "Weekly COGS ($)"]])
+import plotly.express as px
+
+# Convert data for Plotly charting
+df_melted = df.melt(
+    id_vars=["Week"], 
+    value_vars=["Ending Inventory ($)", "Purchases ($)", "Weekly COGS ($)"],
+    var_name="Metric", 
+    value_name="Amount ($)"
+)
+
+fig = px.line(
+    df_melted, 
+    x="Week", 
+    y="Amount ($)", 
+    color="Metric",
+    markers=True,
+    title="Inventory & Sales Trajectory"
+)
+
+# Keeps chronological order and cleans up x-axis ticks
+fig.update_xaxes(type='category', tickangle=-45)
+fig.update_layout(hovermode="x unified")
+
+st.plotly_chart(fig, use_container_width=True)
 
 st.subheader("Weekly Breakdown")
 st.dataframe(df, use_container_width=True)
